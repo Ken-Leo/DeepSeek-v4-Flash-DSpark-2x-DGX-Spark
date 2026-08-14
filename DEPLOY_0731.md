@@ -22,17 +22,19 @@
 
 ## 1. 提前准备（在 head + worker 分别执行）
 
-### 1.1 部署目录（head）
-仓库已在本项目文件夹。若服务器上还没有，克隆并对齐：
+### 1.1 部署目录（head, 放到 Downloads 下）
+仓库所在目录：`/home/kenleo_dgx/Downloads/DeepSeek-v4-Flash-DSpark-2x-DGX-Spark`（与 `spark-vllm-docker` 同级）。
+若服务器上还没有该仓库，从你的 fork 克隆并对齐：
 
 ```bash
-cd /home/kenleo_dgx
-git clone https://github.com/MiaAI-Lab/DeepSeek-v4-Flash-DSpark-2x-DGX-Spark.git mia-0731
-cd mia-0731
+cd /home/kenleo_dgx/Downloads
+git clone git@github.com:Ken-Leo/DeepSeek-v4-Flash-DSpark-2x-DGX-Spark.git
+cd DeepSeek-v4-Flash-DSpark-2x-DGX-Spark
 git fetch origin main && git reset --hard origin/main
 ```
 
-把本项目生成的 `.env.dspark` 放到该目录。
+把本项目生成的 `.env.dspark` 放到这个目录（即 `/home/kenleo_dgx/Downloads/DeepSeek-v4-Flash-DSpark-2x-DGX-Spark/.env.dspark`）。
+
 
 ### 1.2 拉取运行时镜像（head 和 worker 都要）
 ```bash
@@ -119,7 +121,7 @@ ssh 192.168.177.12 'docker ps --filter "name=vllm_node"'
 ## 4. 启动（head 上执行 MiaAI 脚本）
 
 ```bash
-cd <mia-0731 目录>
+cd /home/kenleo_dgx/Downloads/DeepSeek-v4-Flash-DSpark-2x-DGX-Spark
 ./start-deepseek-v4-flash-dspark.sh
 ```
 该脚本会自动：
@@ -154,7 +156,7 @@ docker compose --env-file .env.dspark -f docker-compose.dspark.yml logs vllm-dsp
 # 项目名 deepseek-v4-flash 的容器
 docker compose --env-file .env.dspark -f docker-compose.dspark.yml down
 # worker 同步停
-ssh 192.168.177.12 'cd <worker的mia目录> && docker compose --env-file .env.dspark -f docker-compose.dspark.yml down'
+ssh 192.168.177.12 'cd /home/kenleo_dgx/Downloads/DeepSeek-v4-Flash-DSpark-2x-DGX-Spark && docker compose --env-file .env.dspark -f docker-compose.dspark.yml down'
 ```
 > 或用仓库自带的 `./stop-deepseek-v4-flash-dspark.sh`（它 `docker rm -f` 兜底）。
 
