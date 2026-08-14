@@ -94,22 +94,28 @@ ss -tlnp | grep -E ':8888|:25000'                          # 确认端口占用�
 
 ---
 
-## 3. 停掉当前 eugr 部署（手动，先 head 后 worker）
+## 3. 停掉当前 eugr 部署（用 eugr 官方停止命令）
+
+**首选：直接调用 eugr 的 launch-cluster.sh stop（它会同时处理 head + worker 的 `vllm_node` 容器）**：
 
 ```bash
-# 3.1 确认当前 eugr 容器
-docker ps --filter "name=vllm_node"
-# 3.2 停止并删除（eugr 方案可用你熟悉的方式；下面兜底）
-docker stop vllm_node && docker rm vllm_node
-# 3.3 若 worker 上也有容器，一并停
-ssh 192.168.177.12 'docker ps --filter "name=vllm_node"'
-# 3.4 确认 8888 已释放
-ss -tlnp | grep 8888 || echo "8888 free"
+cd /home/kenleo_dgx/Downloads/spark-vllm-docker
+./launch-cluster.sh stop
 ```
-> worker 上若用 MiaAI start 会自动同步，但 worker 上现存的 eugr 容器需手动停（head 上 `ssh 192.168.177.12 'docker stop vllm_node'` 等）。
 
----
+> `launch-cluster.sh stop` 内部调用 `cleanup`，会停止并移除 head 与所有 worker（来自 eugr `.env` 的 `CLUSTER_NODES`）上的 `vllm_node` 容器。
+> 确认 8888 已释放：
+> ```bash
+> ss -tlnp | grep 8888 || echo "8888 free"
+> ```
 
+**兜底（若 launch-cluster.sh stop 异常时手动清理）**：
+```bash
+# head
+docker stop vllm_node && docker rm vllm_node
+# worker（按需）
+ssh 192.168.177.12 'docker ps --filter "name=vllm_node"'
+```
 ## 4. 启动（head 上执行 MiaAI 脚本）
 
 ```bash
