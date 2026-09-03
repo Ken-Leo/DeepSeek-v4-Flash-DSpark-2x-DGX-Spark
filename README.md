@@ -139,7 +139,7 @@ hosts or it can kill vLLM under deep-context load.
 | Batch tokens | `MAX_NUM_BATCHED_TOKENS=8192` |
 | KV | `nvfp4_ds_mla`, **17.04 GiB / 2,331,430 tokens** on this cluster (util 0.83; Vision-Exp ViT takes more weight RAM than 0731) |
 | Spec | `MTP_NUM_TOKENS=6` (≥ `dspark_block_size` 5 and divisible by Vision-Exp `n_predict=3`) |
-| Thinking | `DEFAULT_THINKING=max` (`off` / `low` / `high` / `max`) |
+| Thinking | `DEFAULT_THINKING=low` (`off` / `low` / `high` / `max`) |
 | Graphs | `VLLM_USE_BREAKABLE_CUDAGRAPH=0` (keep this; unset is slower) |
 
 `start-*.sh` exports `GPU_MEMORY_UTILIZATION` from
@@ -178,7 +178,7 @@ cluster wiring, not product switches. Full Anemll vs Stage-C matrix:
 | `DSPARK_REVISION` | `86f746b36186f0e567729a5c06a8c918caba82a9` | Official Vision-Exp pin. Empty = tip of `main`. |
 | `DSPARK_REVISION_ABLITERATED` | empty | Abliterated pin. Empty = tip of that repo. |
 | `DSPARK_MODEL_OFFICIAL` / `DSPARK_MODEL_ABLITERATED` | the two HF ids above | Override only if you intentionally swap the repo id. Do not point this at the 0731 ablit dump — that drops `image_url`. |
-| `SERVED_MODEL_NAME` | `deepseek-v4-flash-vision-exp` | Name clients send as `model`. |
+| `SERVED_MODEL_NAME` | `deepseek-v4-flash-vision-exp` | Space-separated aliases; clients may send any alias as `model`. Startup probes, warmup, and smoke use the first alias. |
 | `HF_HUB_OFFLINE` | `1` | `1` after the hub cache is warm. Prepare forces online for the download. |
 | `DSPARK_WORKER_HF_NFS` | `0` | **`0`** (default) = bind `WORKER_HF_CACHE` as a second copy (`prepare` downloads on the worker). **`1`** = worker mounts head `HF_CACHE` over NFSv4 on ConnectX (no local checkpoint). |
 
@@ -256,7 +256,7 @@ DSPARK_REVISION=<commit>
 
 | Variable | Default | What it does |
 | --- | --- | --- |
-| **`DEFAULT_THINKING`** | `max` | `off` / `low` / `high` / `max`. Request-level `chat_template_kwargs` still wins. |
+| **`DEFAULT_THINKING`** | `low` | `off` / `low` / `high` / `max`. Request-level `chat_template_kwargs` still wins. |
 | `VLLM_HOST` | `0.0.0.0` | `127.0.0.1` for head-only tests. |
 | `VLLM_PORT` | `8888` | Or `./start-… --port 9000` for one launch. |
 
