@@ -130,6 +130,10 @@ services:
 
       VLLM_USE_FLASHINFER_SAMPLER: "${VLLM_USE_FLASHINFER_SAMPLER:-1}"
       VLLM_USE_BREAKABLE_CUDAGRAPH: "${VLLM_USE_BREAKABLE_CUDAGRAPH:-0}"
+      # Stateful previous_response_id continuation (see README "Strict Responses"):
+      # keep the Responses API store ON so clients reference prior responses by id
+      # instead of replaying the full history every turn.
+      VLLM_ENABLE_RESPONSES_API_STORE: "${VLLM_ENABLE_RESPONSES_API_STORE:-0}"
       # Issue #65/#87: mid-serve CuTeDSL/TileLang JIT can exceed the 300s
       # sample_tokens RPC default and kill EngineCore (looks like an NCCL
       # wedge on TP=2). 1800s rides out a worst-case compile; a true hang
